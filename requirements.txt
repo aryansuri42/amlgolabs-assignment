@@ -1,0 +1,8 @@
+pypdf
+langchain
+langchain-community
+sentence-transformers 
+transformers
+tqdm
+json
+faiss-cpu
