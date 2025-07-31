@@ -3,7 +3,7 @@
 
 # Project Architecture and Flow
 
-![Architecture](Images/RAG Architecture.png)
+![Architecture](Images\RAG Architecture.png)
 
 
 # Overview
