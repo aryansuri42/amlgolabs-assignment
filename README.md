@@ -17,59 +17,47 @@ This project implements a Streamlit-based Retrieval-Augmented Generation (RAG) s
 git clone https://github.com/aryansuri42/amlgolabs-assignment.git
 cd amlgolabs-assignment
 pip install -r requirements.txt
+streamlit run app.py
 ```
 
-Chunks the text into manageable segments for embedding.
+---
 
-2. Create Embeddings and Build Vector DB
-bash
-Copy
-Edit
-python src/vector_searching.py
-Uses the SentenceTransformer model to embed the text chunks.
+##  Preprocessing and Vector Store Creation
 
-Stores the embeddings into a FAISS vector database.
+1. **Document Loading & Chunking:**
+   - PDF documents are loaded using `PyPDFLoader`.
+   - Text is split using `RecursiveCharacterTextSplitter` with:
+     - `chunk_size=300`
+     - `chunk_overlap=50`
+   - This ensures that the document is broken into coherent segments without losing context.
 
-3. Load the RAG Pipeline
-bash
-Copy
-Edit
-python src/rag_pipeline.py
-Builds the retrieval pipeline using FAISS and Hugging Face Transformers.
+2. **Embedding Generation:**
+   - Each chunk is embedded using the `sentence-transformers/all-MiniLM-L6-v2` model.
+   - These embeddings capture the semantic meaning of each chunk for better retrieval.
 
-Defines the prompt template and LLMChain.
+3. **Storing in FAISS Vector Database:**
+   - The embeddings are indexed and stored using FAISS, enabling fast similarity search.
+   - The index can be saved and reloaded efficiently for production use.
 
-Running the Chatbot with Streaming
-bash
-Copy
-Edit
-streamlit run app.py
-Enter your question in the input box.
+---
 
-The system will retrieve the top relevant document chunks and generate an answer using the LLM.
+## RAG Pipeline using Mistral 7B
 
-The context retrieved will also be displayed for transparency.
+- A RAG pipeline is implemented where:
+  - The user's query is embedded and compared with the FAISS index.
+  - The top-matching chunks (contexts) are retrieved.
+  - These contexts are passed to a **Mistral 7B** LLM (quantized) using HuggingFace Transformers for answer generation.
+  - The generated answer is precise and grounded in the document context.
 
-Model and Embedding Choices
-Component	Choice	Justification
-Embedding Model	all-mpnet-base-v2	Strong semantic similarity, widely used for dense vector search
-LLM	mistralai/Mistral-7B-Instruct-v0.1	Instruction-tuned, quantized for low memory footprint
-Vector Store	FAISS	Fast and scalable similarity search on dense vectors
-Chunking Method	RecursiveCharacterTextSplitter	Ensures semantic coherence and overlap for better context recall
+---
 
-Sample Queries and Outputs
-Query Example
-vbnet
-Copy
-Edit
-What is eBay's policy on returns?
-Output Example
-vbnet
-Copy
-Edit
-eBay allows sellers to specify their return policy in listings. However, all sellers must comply with eBay's Money Back Guarantee which ensures buyers can return items not received or not as described, within a specific time frame.
-Context Example
-kotlin
-Copy
-Edit
-eBay’s Money Back Guarantee ensures buyers can return items not as described. The seller may specif
+## Streamlit App
+
+- A simple and interactive UI is built using **Streamlit**.
+- Key features:
+  - Query input box for user.
+  - Answer generated using the RAG pipeline.
+  - Expandable section to display the exact document context used for the answer.
+  - Model name and information shown in the sidebar.
+
+---
