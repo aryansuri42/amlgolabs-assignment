@@ -3,7 +3,7 @@ from langchain.vectorstores import FAISS
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 import transformers
 import torch
-from transformers import BitsAndBytesConfig, AutoModelForCausalLM
+from transformers import BitsAndBytesConfig, AutoModelForCausalLM, AutoConfig, AutoTokenizer
 from langchain.llms import HuggingFacePipeline
 from langchain.prompts import PromptTemplate
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
@@ -25,9 +25,9 @@ class RagPipeline(VectorDBSearching):
         self.db = FAISS.from_documents(self.components[1], 
                           HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2'))
         self.model_name='mistralai/Mistral-7B-Instruct-v0.1'
-        self.model_config = transformers.AutoConfig.from_pretrained(self.model_name)
+        self.model_config = AutoConfig.from_pretrained(self.model_name)
 
-        self.tokenizer = transformers.AutoTokenizer.from_pretrained(self.model_name, trust_remote_code=True)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, trust_remote_code=True)
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.tokenizer.padding_side = "right"
         self.use_4bit = True
@@ -56,7 +56,7 @@ class RagPipeline(VectorDBSearching):
         Returns:
             list: [retrieved context, generated response]
         """
-        
+
         self.text_generation_pipeline = transformers.pipeline(
                 model=self.model_llm,
                 tokenizer=self.tokenizer,
