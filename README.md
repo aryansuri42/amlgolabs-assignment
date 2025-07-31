@@ -13,6 +13,9 @@ This project implements a Streamlit-based Retrieval-Augmented Generation (RAG) s
 # Screen Recording
 https://drive.google.com/file/d/1BhpteSPYkuQy403A8dZ5zKBQZs1ZmC8r/view?usp=sharing
 
+# Demonstration link
+https://drive.google.com/file/d/1zSiHr4dTBMGZt7n1v2P0Ju00h5a-hUo6/view?usp=sharing
+
 # Steps to Run
 
 ```bash 
