@@ -7,6 +7,7 @@ from document_preprocessing import DocumentPreprocessing
 class VectorDBSearching(DocumentPreprocessing):
 
     def __init__(self):
+        
         super().__init__()
         self.components = self.RecursiveSplitter()
         self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')

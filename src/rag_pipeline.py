@@ -13,6 +13,14 @@ from langchain_core.runnables import RunnablePassthrough
 class RagPipeline(VectorDBSearching):
 
     def __init__(self):
+
+        """
+        The RagPipeline class is responsible for building a Retrieval-Augmented Generation (RAG) pipeline.
+        It inherits from VectorDBSearching, which provides document preprocessing and vector search capabilities.
+        This class loads a quantized LLM (Mistral-7B) using HuggingFace Transformers, embeds the documents using 
+        sentence-transformers, and generates responses based on retrieved context using LangChain.
+        """
+
         super().__init__()
         self.db = FAISS.from_documents(self.components[1], 
                           HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2'))
@@ -38,6 +46,17 @@ class RagPipeline(VectorDBSearching):
                         )
         
     def Pipeline(self, query):
+        """
+        Executes the RAG pipeline by retrieving context from the FAISS DB and generating 
+        an answer using the quantized Mistral model.
+        
+        Args:
+            query (str): User query
+        
+        Returns:
+            list: [retrieved context, generated response]
+        """
+        
         self.text_generation_pipeline = transformers.pipeline(
                 model=self.model_llm,
                 tokenizer=self.tokenizer,
