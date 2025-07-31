@@ -11,13 +11,13 @@
 This project implements a Streamlit-based Retrieval-Augmented Generation (RAG) system that allows users to query information grounded in a specific document (e.g., eBay User Agreement). It combines FAISS vector search, SentenceTransformers embeddings, and a quantized Mistral-7B model via Hugging Face for fast and accurate answers.
 
 
-Steps to Run
-1. Preprocessing
-bash
-Copy
-Edit
-python src/document_preprocessing.py
-Loads the input PDF using Langchain's PyPDFLoader.
+# Steps to Run
+
+```bash 
+git clone https://github.com/aryansuri42/amlgolabs-assignment.git
+cd amlgolabs-assignment
+pip install -r requirements.txt
+```
 
 Chunks the text into manageable segments for embedding.
 
