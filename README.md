@@ -1,42 +1,14 @@
-Retrieval-Augmented Generation (RAG) Chatbot
+# Retrieval-Augmented Generation (RAG) Chatbot
+
+
+# Project Architecture and Flow
+
+![Architecture](Images/RAG Architecture.png)
+
+
+# Overview
 This project implements a Streamlit-based Retrieval-Augmented Generation (RAG) system that allows users to query information grounded in a specific document (e.g., eBay User Agreement). It combines FAISS vector search, SentenceTransformers embeddings, and a quantized Mistral-7B model via Hugging Face for fast and accurate answers.
 
-Project Architecture and Flow
-mathematica
-Copy
-Edit
-PDF Document
-    │
-    └──► Preprocessing
-             └──► Text Chunking (RecursiveCharacterTextSplitter)
-                     └──► Embedding Generation (SentenceTransformer)
-                             └──► Vector DB Creation (FAISS)
-                                     └──► Query Input
-                                             ├──► Top-k Similar Chunks Retrieved
-                                             └──► Passed as Context to Mistral-7B LLM (Quantized)
-                                                     └──► Final Answer Generated with Context
-Document Loader: PyPDFLoader (via Langchain)
-
-Chunking Strategy: RecursiveCharacterTextSplitter (chunk size 300, overlap 50)
-
-Embedding Model: all-mpnet-base-v2 (SentenceTransformers)
-
-Vector Store: FAISS for efficient similarity search
-
-LLM: Quantized mistralai/Mistral-7B-Instruct-v0.1 (4-bit)
-
-Frontend: Streamlit UI for interactive queries
-
-Setup Instructions
-Clone the repository and install dependencies:
-
-bash
-Copy
-Edit
-git clone https://github.com/yourusername/rag-chatbot.git
-cd rag-chatbot
-pip install -r requirements.txt
-Ensure that you have access to the quantized Mistral model via Hugging Face, or adjust to use a different model if needed.
 
 Steps to Run
 1. Preprocessing
