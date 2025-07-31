@@ -6,3 +6,17 @@ transformers
 tqdm
 json
 faiss-cpu
+pinecone
+python-dotenv
+ipywidgets
+protobuf
+bitsandbytes
+timm
+BitsAndBytesConfig
+sentencepiece
+tokenizers
+accelerate==0.26.0
+peft
+trl
+mistralai
+streamlit
