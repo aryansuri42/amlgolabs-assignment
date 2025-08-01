@@ -60,15 +60,7 @@ class RagPipeline(VectorDBSearching):
             list: [retrieved context, generated response]
         """
 
-        # self.text_generation_pipeline = transformers.pipeline(
-        #         model=self.model_llm,
-        #         tokenizer=self.tokenizer,
-        #         task="text-generation",
-        #         temperature=0.2,
-        #         repetition_penalty=1.1,
-        #         return_full_text=True,
-        #         max_new_tokens=300,
-        #     )
+
         self.prompt_template = """
                 <s>[INST]
                 You are a helpful assistant. Use the information from the context below to answer the user's question.
@@ -82,16 +74,7 @@ class RagPipeline(VectorDBSearching):
                 [/INST]
                 """
         
-        # self.mistral_llm = HuggingFacePipeline(pipeline=self.text_generation_pipeline)
-
-        # Create prompt from prompt template 
-        # self.prompt = PromptTemplate(
-        #     input_variables=["context", "question"],
-        #     template=self.prompt_template,
-        # )
-
-        # # Create llm chain 
-        # self.llm_chain = LLMChain(llm=self.mistral_llm, prompt=self.prompt)
+   
         self.retriever = self.db.as_retriever()
         def format_docs(docs):
             return "\n\n".join([doc.page_content for doc in docs])
@@ -111,11 +94,6 @@ class RagPipeline(VectorDBSearching):
         thread.start()
         return (context, streamer)
 
-        # self.rag_chain = ( 
-        # {"context": self.retriever|format_docs, "question": RunnablePassthrough()}
-        #     | self.llm_chain
-        # )
-        # answer = self.rag_chain.invoke(query)
-        # return [answer['context'], answer['text']]
+ 
     
 __all__ = ["RagPipeline"]
