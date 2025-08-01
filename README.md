@@ -10,11 +10,9 @@
 # Overview
 This project implements a Streamlit-based Retrieval-Augmented Generation (RAG) system that allows users to query information grounded in a specific document (e.g., eBay User Agreement). It combines FAISS vector search, SentenceTransformers embeddings, and a quantized Mistral-7B model via Hugging Face for fast and accurate answers.
 
-# Screen Recording
-https://drive.google.com/file/d/1BhpteSPYkuQy403A8dZ5zKBQZs1ZmC8r/view?usp=sharing
 
 # Demonstration link
-https://drive.google.com/file/d/1zSiHr4dTBMGZt7n1v2P0Ju00h5a-hUo6/view?usp=sharing
+https://drive.google.com/file/d/1VIzFZl7swghIddANUnWfZVPWkqXOM2zK/view?usp=sharing
 
 # Steps to Run
 
