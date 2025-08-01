@@ -3,12 +3,13 @@ from langchain.vectorstores import FAISS
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 import transformers
 import torch
-from transformers import BitsAndBytesConfig, AutoModelForCausalLM, AutoConfig, AutoTokenizer
+from transformers import BitsAndBytesConfig, AutoModelForCausalLM, AutoConfig, AutoTokenizer, TextIteratorStreamer
 from langchain.llms import HuggingFacePipeline
 from langchain.prompts import PromptTemplate
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain.chains import LLMChain
 from langchain_core.runnables import RunnablePassthrough
+import threading
 
 class RagPipeline(VectorDBSearching):
 
@@ -34,10 +35,12 @@ class RagPipeline(VectorDBSearching):
         self.bnb_4bit_compute_dtype = "float16"
         self.bnb_4bit_quant_type = "nf4"
         self.use_nested_quant = False
+        self.bnb_4bit_compute_dtype = "float16"
+        self.compute_dtype = getattr(torch, self.bnb_4bit_compute_dtype)
         self.bnb_config = BitsAndBytesConfig(
                         load_in_4bit=self.use_4bit,
                         bnb_4bit_quant_type=self.bnb_4bit_quant_type,
-                        bnb_4bit_compute_dtype=self.bnb_4bit_compute_dtype,
+                        bnb_4bit_compute_dtype=self.compute_dtype,
                         bnb_4bit_use_double_quant=self.use_nested_quant,
                     )
         self.model_llm = AutoModelForCausalLM.from_pretrained(
@@ -57,19 +60,20 @@ class RagPipeline(VectorDBSearching):
             list: [retrieved context, generated response]
         """
 
-        self.text_generation_pipeline = transformers.pipeline(
-                model=self.model_llm,
-                tokenizer=self.tokenizer,
-                task="text-generation",
-                temperature=0.2,
-                repetition_penalty=1.1,
-                return_full_text=True,
-                max_new_tokens=300,
-            )
+        # self.text_generation_pipeline = transformers.pipeline(
+        #         model=self.model_llm,
+        #         tokenizer=self.tokenizer,
+        #         task="text-generation",
+        #         temperature=0.2,
+        #         repetition_penalty=1.1,
+        #         return_full_text=True,
+        #         max_new_tokens=300,
+        #     )
         self.prompt_template = """
-                [INST]
+                <s>[INST]
                 You are a helpful assistant. Use the information from the context below to answer the user's question.
-                If the answer is not in the context, say "The document does not contain that information."
+                the context will be provided properly and there is always an answer if asked from the document. Try to answer
+                the question from the provided context only.
 
                 Context:
                 {context}
@@ -78,24 +82,40 @@ class RagPipeline(VectorDBSearching):
                 [/INST]
                 """
         
-        self.mistral_llm = HuggingFacePipeline(pipeline=self.text_generation_pipeline)
+        # self.mistral_llm = HuggingFacePipeline(pipeline=self.text_generation_pipeline)
 
         # Create prompt from prompt template 
-        self.prompt = PromptTemplate(
-            input_variables=["context", "question"],
-            template=self.prompt_template,
-        )
+        # self.prompt = PromptTemplate(
+        #     input_variables=["context", "question"],
+        #     template=self.prompt_template,
+        # )
 
-        # Create llm chain 
-        self.llm_chain = LLMChain(llm=self.mistral_llm, prompt=self.prompt)
+        # # Create llm chain 
+        # self.llm_chain = LLMChain(llm=self.mistral_llm, prompt=self.prompt)
         self.retriever = self.db.as_retriever()
         def format_docs(docs):
             return "\n\n".join([doc.page_content for doc in docs])
-        self.rag_chain = ( 
-        {"context": self.retriever|format_docs, "question": RunnablePassthrough()}
-            | self.llm_chain
-        )
-        answer = self.rag_chain.invoke(query)
-        return [answer['context'], answer['text']]
+        
+        docs = self.retriever.get_relevant_documents(query)
+        context = format_docs(docs)
+        prompt = self.prompt_template.format(context=context, question=query)
+        inputs = self.tokenizer(prompt, return_tensors="pt", padding=True).to(self.model_llm.device)
+        streamer = TextIteratorStreamer(self.tokenizer, skip_special_tokens=True)
+        generate_kwargs = dict(
+                            inputs=inputs.input_ids,
+                            attention_mask=inputs.attention_mask,
+                            streamer=streamer,
+                            max_new_tokens=300,
+                            )
+        thread = threading.Thread(target=self.model_llm.generate, kwargs=generate_kwargs)
+        thread.start()
+        return (context, streamer)
+
+        # self.rag_chain = ( 
+        # {"context": self.retriever|format_docs, "question": RunnablePassthrough()}
+        #     | self.llm_chain
+        # )
+        # answer = self.rag_chain.invoke(query)
+        # return [answer['context'], answer['text']]
     
 __all__ = ["RagPipeline"]

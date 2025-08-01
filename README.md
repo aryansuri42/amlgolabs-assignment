@@ -51,8 +51,9 @@ streamlit run app.py
 - A RAG pipeline is implemented where:
   - The user's query is embedded and compared with the FAISS index.
   - The top-matching chunks (contexts) are retrieved.
-  - These contexts are passed to a **Mistral 7B** LLM (quantized) using HuggingFace Transformers for answer generation.
-  - The generated answer is precise and grounded in the document context.
+  - These contexts are passed to a **Mistral 7B** LLM (quantized) loaded via Hugging Face Transformers.
+  - The response is generated using the model’s generate() method with TextIteratorStreamer
+  for real-time streaming output.
 
 ---
 
@@ -64,5 +65,6 @@ streamlit run app.py
   - Answer generated using the RAG pipeline.
   - Expandable section to display the exact document context used for the answer.
   - Model name and information shown in the sidebar.
+  - Clear chat button to clear the chat
 
 ---
